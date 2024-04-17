@@ -1,0 +1,4 @@
+module "ressources" {
+    source = "./ressources"
+}
+
