@@ -31,7 +31,7 @@ You need to run install.sh script on the node. Please check if Ip Pool created b
 docker network inspect -f '{{.IPAM.Config}}' kind
 ```
 
-### LoadBalancer
+### Service
 
 ```bash
 kubectl apply -f kubernetes/resources/loadbalancer.yaml
