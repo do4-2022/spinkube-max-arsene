@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3.8-management
+        ports:
+        - name: AMQP
+          containerPort: 5672
+        - name: Management
+          containerPort: 15672
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+  - name: AMQP
+    port: 5672
+    targetPort: 5672  
+  - name: Management
+    port: 15672
+    targetPort: 15672
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: keda-rabbitmq-secret
+data:
+  host: YW1xcDovL2d1ZXN0OnBhc3N3b3JkQGxvY2FsaG9zdDo1NjcyL3Zob3N0Cg== # base64 encoded value of the connection string to rabbitmq
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: keda-trigger-auth-rabbitmq-conn
+  namespace: default
+spec:
+  secretTargetRef:
+    - parameter: host
+      name: keda-rabbitmq-secret
+      key: host
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: rabbitmq-scaledobject
+  namespace: default
+spec:
+  scaleTargetRef:
+    name: keda-spinapp
+  minReplicaCount: 1
+  maxReplicaCount: 20
+  triggers:
+  - type: rabbitmq
+    metadata:
+      protocol: amqp
+      queueName: testqueue
+      mode: QueueLength
+      value: "5"
+    authenticationRef:
+      name: keda-trigger-auth-rabbitmq-conn
