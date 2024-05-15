@@ -5,7 +5,7 @@ resource "openstack_compute_instance_v2" "instance" {
     key_pair      = "spinkube-keypair"
     security_groups = ["spinkube_secgroup"]
     network {
-        name = "main"
+        name = var.private_network_name
     }
     user_data = <<-EOF
     #!/bin/bash
@@ -62,5 +62,11 @@ resource "openstack_compute_instance_v2" "instance" {
     oci://ghcr.io/spinkube/charts/spin-operator
 
     kubectl apply -f https://raw.githubusercontent.com/spinkube/spin-operator/main/config/samples/simple.yaml
+
+    # Add the Keda repo and the Keda HTTP trigger
+    helm repo add kedacore https://kedacore.github.io/charts
+    helm repo update
+    helm install keda kedacore/keda --namespace --create-namespace
+    helm install http-add-on kedacore/keda-add-ons-http --version 0.8.0 --namespace 
     EOF
 }
