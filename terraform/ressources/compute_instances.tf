@@ -8,17 +8,27 @@ resource "openstack_compute_instance_v2" "instance" {
         name = var.private_network_name
     }
     user_data = <<-EOF
-    #!/bin/bash
-    curl -sfL https://get.k3s.io | sh -
-    curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.20.0/bin/linux/amd64/kubectl
+ #!/bin/bash
+
+    # Install DOcker
+
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sudo sh get-docker.sh
+    sudo usermod -aG docker $USER
+    newgrp docker
+
+    # Install kubectl
+    curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl
     chmod +x ./kubectl
     sudo mv ./kubectl /usr/local/bin/kubectl
 
-    sudo su ubuntu
-    cd /home/ubuntu
-    mkdir -p .kube/
-    sudo cp /etc/rancher/k3s/k3s.yaml .kube/config  && sudo chmod +r .kube/config && export KUBECONFIG=.kube/config
-    
+    # Install Kind
+    [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64
+    sudo mv ./kind /usr/local/bin/kind
+    sudo chmod 777 /usr/local/bin/kind 
+    kind create cluster
+
+
     # Install helm
     curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
     chmod 700 get_helm.sh
@@ -62,7 +72,7 @@ resource "openstack_compute_instance_v2" "instance" {
     oci://ghcr.io/spinkube/charts/spin-operator
 
     kubectl apply -f https://raw.githubusercontent.com/spinkube/spin-operator/main/config/samples/simple.yaml
-
+    
     # Add the Keda repo and the Keda HTTP trigger
     helm repo add kedacore https://kedacore.github.io/charts
     helm repo update
