@@ -1,0 +1,11 @@
+# https://raw.githubusercontent.com/spinkube/spin-operator/main/config/samples/keda-scaledobject.yaml
+# 
+apiVersion: keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: http-scaling
+spec:
+  scaleTargetRef:
+    name: keda-spinapp
+  minReplicaCount: 1
+  maxReplicaCount: 20
