@@ -1,10 +1,61 @@
 # spinkube-max-arsene
 
+## Create infrastructure
 
+### Prerequisites
+
+- [Terraform](https://www.terraform.io/downloads.html)
+
+Change the name of the network used by the instances in the `terraform/ressources/variables.tf` file.
+
+### Terraform
+
+```bash
+cd terraform
+terraform init
+terraform apply
+```
+
+### LoadBalancer
+
+#### MetalLB
+
+```bash
+cd kubernetes/metallb
+./install.sh
+```
+
+You need to run install.sh script on the node. Please check if Ip Pool created by Kind is the same as in the metallb-config.yaml file.
+
+```bash
+docker network inspect -f '{{.IPAM.Config}}' kind
+```
+
+### LoadBalancer
+
+```bash
+kubectl apply -f kubernetes/resources/loadbalancer.yaml
+```
+
+Check if the LoadBalancer has received an IP address.
+
+```bash
+kubectl get svc
+```
+
+### HAProxy
+
+The IP address of the LoadBalancer is used is only available on the host machine. You can use HAProxy to expose the LoadBalancer to the outside.
+
+Install HA et config la redirect de chatgpt
+
+```bash
+
+```
 
 ## Scale on Rabbit messages
 
-This demo showcase the ability to scale a deployment based on the number of messages in a RabbitMQ queue. 
+This demo showcase the ability to scale a deployment based on the number of messages in a RabbitMQ queue.
 The deployment contains a RabbitMQ consumer and a producer. We will see how to scale the consumer based on the number of messages in the queue.
 
 ### Set-up the cluster
