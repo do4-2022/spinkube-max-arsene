@@ -76,7 +76,7 @@ resource "openstack_compute_instance_v2" "instance" {
     # Add the Keda repo and the Keda HTTP trigger
     helm repo add kedacore https://kedacore.github.io/charts
     helm repo update
-    helm install keda kedacore/keda --namespace --create-namespace
-    helm install http-add-on kedacore/keda-add-ons-http --version 0.8.0 --namespace 
+    helm install keda kedacore/keda --namespace keda --create-namespace
+    helm install http-add-on kedacore/keda-add-ons-http --version 0.8.0 --namespace keda
     EOF
 }

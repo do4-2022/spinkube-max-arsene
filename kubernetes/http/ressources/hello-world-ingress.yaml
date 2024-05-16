@@ -13,6 +13,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: hello-world-two
+            name: simple-spinapp
             port:
               number: 80
