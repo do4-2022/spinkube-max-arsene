@@ -4,7 +4,6 @@ metadata:
   name: v2-ingress-requests
 spec:
   scaleTargetRef:
-    kind:          SpinApp                       # Optional. Default: Deployment
     name:          simple-spinapp                  # Mandatory. Must be in the same namespace as the ScaledObject
   pollingInterval:  15                              # Optional. Default: 30 seconds
   cooldownPeriod:   30                              # Optional. Default: 300 seconds

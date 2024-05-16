@@ -1,7 +1,9 @@
 # Autoscale Kubernetes pods based on Ingress requests
 
 ```bash
-helm upgrade ingress-nginx ingress-nginx \
+kubectl create namespace ingress-nginx
+
+helm install ingress-nginx ingress-nginx \
 --repo https://kubernetes.github.io/ingress-nginx \
 --namespace ingress-nginx \
 --set controller.metrics.enabled=true \
@@ -10,16 +12,15 @@ helm upgrade ingress-nginx ingress-nginx \
 ```
 
 ```bash
-kubectl create ns keda
-
-helm repo add kedacore https://kedacore.github.io/charts
-helm repo update
-helm upgrade --install keda kedacore/keda -n keda
+kubectl create ns prometheus
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --namespace prometheus
+helm upgrade --install prometheus prometheus-community/prometheus -n prometheus
 ```
 
 ```bash
-kubectl get pod -l app=keda-operator -n keda
+kubectl apply -f resources
 ```
+
 
 # Testing with Minikube
 
