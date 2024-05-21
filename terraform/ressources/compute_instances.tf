@@ -78,5 +78,10 @@ resource "openstack_compute_instance_v2" "instance" {
     helm repo update
     helm install keda kedacore/keda --namespace keda --create-namespace
     helm install http-add-on kedacore/keda-add-ons-http --version 0.8.0 --namespace keda
+
+    # Install the Helm Chart for rabbit
+    helm repo add bitnami https://charts.bitnami.com/bitnami
+    helm install rabbitmq --set auth.username=user --set auth.password=PASSWORD bitnami/rabbitmq --wait
+    # kubectl apply -f deploy/deploy-consumer.yaml
     EOF
 }
