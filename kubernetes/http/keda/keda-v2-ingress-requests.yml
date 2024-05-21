@@ -4,16 +4,15 @@ metadata:
   name: v2-ingress-requests
 spec:
   scaleTargetRef:
-    kind:          SpinApp                       # Optional. Default: Deployment
-    name:          simple-spinapp                  # Mandatory. Must be in the same namespace as the ScaledObject
-  pollingInterval:  15                              # Optional. Default: 30 seconds
-  cooldownPeriod:   30                              # Optional. Default: 300 seconds
-  minReplicaCount:  1                               # Optional. Default: 0
-  maxReplicaCount:  5                               # Optional. Default: 100
+    name: simple-spinapp # Mandatory. Must be in the same namespace as the ScaledObject
+  pollingInterval: 15 # Optional. Default: 30 seconds
+  cooldownPeriod: 30 # Optional. Default: 300 seconds
+  minReplicaCount: 1 # Optional. Default: 0
+  maxReplicaCount: 5 # Optional. Default: 100
   triggers:
-  - type: prometheus
-    metadata:
-      serverAddress: http://prometheus-server.prometheus.svc.cluster.local
-      metricName: nginx_ingress_controller_requests
-      threshold: '5'
-      query: sum(rate(nginx_ingress_controller_requests{path="/"}[2m]))
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus-operated.prometheus.svc.cluster.local:9090
+        metricName: nginx_ingress_controller_requests
+        threshold: "5"
+        query: sum(rate(nginx_ingress_controller_requests{path="/"}[1m]))

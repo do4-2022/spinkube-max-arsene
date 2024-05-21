@@ -8,10 +8,9 @@ resource "openstack_compute_instance_v2" "instance" {
         name = var.private_network_name
     }
     user_data = <<-EOF
- #!/bin/bash
+    #!/bin/bash
 
     # Install DOcker
-
     curl -fsSL https://get.docker.com -o get-docker.sh
     sudo sh get-docker.sh
     sudo usermod -aG docker $USER
@@ -83,5 +82,26 @@ resource "openstack_compute_instance_v2" "instance" {
     helm repo add bitnami https://charts.bitnami.com/bitnami
     helm install rabbitmq --set auth.username=user --set auth.password=PASSWORD bitnami/rabbitmq --wait
     # kubectl apply -f deploy/deploy-consumer.yaml
+    
+    #Install metalb
+    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.5/config/manifests/metallb-native.yaml
+
+    # Install the Ingress Controller
+    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx 
+    helm repo update 
+    helm install ingress-nginx ingress-nginx/ingress-nginx \
+    --namespace ingress-nginx --create-namespace \
+    --set controller.metrics.enabled=true \
+    --set controller.metrics.serviceMonitor.enabled=true \
+    --set controller.metrics.serviceMonitor.additionalLabels.release="my-k8s-prom-stack" \
+    --version=4.5.2 
+
+
+    # Install Prometheus
+
+    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts 
+    helm repo update 
+    helm install --create-namespace --namespace prometheus \
+    my-k8s-prom-stack prometheus-community/kube-prometheus-stack
     EOF
 }
