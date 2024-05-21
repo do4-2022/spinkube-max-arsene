@@ -96,7 +96,6 @@ resource "openstack_compute_instance_v2" "instance" {
     --set controller.metrics.serviceMonitor.additionalLabels.release="my-k8s-prom-stack" \
     --version=4.5.2 
 
-
     # Install Prometheus
 
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts 
